@@ -1,41 +1,44 @@
 package org.bbstilson
 
-// import software.amazon.awssdk.services.ses.SesAsyncClient
+import software.amazon.awssdk.services.ses.SesAsyncClient
+import software.amazon.awssdk.services.ses.model._
+import zio._
 
-class SesUtil(config: SesConfig) { //client: SesAsyncClient,
+import scala.jdk.CollectionConverters._
 
-  def sendEmail(meals: List[Meal]): Unit = {
-    println("Sending email.")
-    println(config.recipients)
-    meals.foreach(println)
-    // response = client.send_email(
-    //         Source=self.from_email,
-    //         Destination={ 'ToAddresses': self.to_emails },
-    //         Message={
-    //             'Subject': {
-    //                 'Data': self._mk_subject(),
-    //                 'Charset': 'utf8'
-    //             },
-    //             'Body': {
-    //                 'Html': {
-    //                     'Data': self._mk_body(meals),
-    //                     'Charset': 'utf8'
-    //                 }
-    //             }
-    //         },
-    //         ReplyToAddresses=[ self.from_email ]
-    //     )
-    println(s"MessageId = ${"response"}") //['MessageId']
+class SesUtil(client: SesAsyncClient, config: SesConfig) {
+  import SesUtil._
+
+  def sendEmail(meals: List[Meal]): Task[SendEmailResponse] = {
+
+    IO.effectAsync[Throwable, SendEmailResponse] { cb =>
+      val destination = Destination.builder.toAddresses(config.recipients.asJava).build
+      val subjectContent = Content.builder.charset(CHARSET).data(SUBJECT).build
+      val htmlContent = Content.builder.charset(CHARSET).data(mkBody(meals)).build
+      val body = Body.builder.html(htmlContent).build
+      val message = Message.builder.subject(subjectContent).body(body).build
+      val request = SendEmailRequest.builder
+        .source(config.recipients.head)
+        .destination(destination)
+        .message(message)
+        .replyToAddresses(config.recipients.head)
+        .build
+
+      client.sendEmail(request).handle[Unit] {
+        case (response, err) =>
+          err match {
+            case null => cb(IO.succeed(response))
+            case ex   => cb(IO.fail(ex))
+          }
+      }
+    }
   }
 }
 
 object SesUtil {
 
-  def mkSubject(): String = {
-    // now = datetime.now().strftime('%m/%d/%Y')
-    // return f'Your weekly meal plan is here! - {now}'
-    ""
-  }
+  val SUBJECT = "Your weekly meal plan is here!"
+  val CHARSET = "UTF-8"
 
   def mkBody(meals: List[Meal]): String = {
     meals.flatMap { meal =>
