@@ -4,13 +4,13 @@ import argonaut._, Argonaut._
 import sttp.client._
 import zio._
 
-class Trello(config: TrelloConfig) {
+object Trello {
   import MealCodec._
 
-  private val url = s"https://api.trello.com/1/lists/${config.listId}/cards"
   implicit private val backend = HttpURLConnectionBackend()
 
-  def getMealsById(): Task[Map[String, Meal]] = Task.effect {
+  def getMealsById(config: TrelloConfig): Task[Map[String, Meal]] = Task.effect {
+    val url = s"https://api.trello.com/1/lists/${config.listId}/cards"
     basicRequest
       .get(uri"$url")
       .send // send http request

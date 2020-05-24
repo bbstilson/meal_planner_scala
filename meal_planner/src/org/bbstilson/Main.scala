@@ -30,7 +30,6 @@ object Main extends App {
       // 0) Initialize classes and temp file.
       tempFilePath <- Task { File.temporaryFile().get.path }
       s3 <- Task { S3AsyncClient.create }
-      trello <- Task { new Trello(config.trello) }
       ses <- Task { SesAsyncClient.create }
 
       // 1) Download suggest counts from S3.
@@ -45,7 +44,7 @@ object Main extends App {
       }
 
       // 3) Get all meals from Trello.
-      mealsById <- trello.getMealsById()
+      mealsById <- Trello.getMealsById(config.trello)
 
       // 4) Check that all meals are in the suggest counts
       // Add missing meals, remove meals no longer in Trello.
