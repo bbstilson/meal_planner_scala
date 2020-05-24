@@ -44,12 +44,11 @@ object Main extends App {
       }
 
       // 3) Get all meals from Trello.
-      meals <- Trello.getMeals(config.trello)
-      mealsById <- Task {
-        meals.foldLeft(Map.empty[String, Meal]) {
+      mealsById <- Trello
+        .getMeals(config.trello)
+        .map(_.foldLeft(Map.empty[String, Meal]) {
           case (map, meal) => map + (meal.id -> meal)
-        }
-      }
+        })
 
       // 4) Check that all meals are in the suggest counts
       // Add missing meals, remove meals no longer in Trello.
