@@ -9,7 +9,7 @@ object SesUtil {
   val CHARSET = "UTF-8"
 
   def mkSendEmailRequest(config: SesConfig, meals: List[Meal]): SendEmailRequest = {
-    val destination = Destination.builder.toAddresses(config.recipients.take(1).asJava).build
+    val destination = Destination.builder.toAddresses(config.recipients.asJava).build
     val subjectContent = Content.builder.charset(CHARSET).data(SUBJECT).build
     val htmlContent = Content.builder.charset(CHARSET).data(mkBody(meals)).build
     val body = Body.builder.html(htmlContent).build
