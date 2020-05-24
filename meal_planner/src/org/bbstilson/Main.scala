@@ -43,7 +43,6 @@ object Main extends App {
         case Some(scs) => IO.succeed(scs)
         case None      => IO.fail(new Exception("Could not deserialize suggest counts file."))
       }
-      _ = prevSuggestCounts.foreach(println)
 
       // 3) Get all meals from Trello.
       mealsById <- trello.getMealsById()
