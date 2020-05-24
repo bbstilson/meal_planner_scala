@@ -9,7 +9,9 @@ object Trello {
 
   implicit private val backend = HttpURLConnectionBackend()
 
-  def getMealsById(config: TrelloConfig): Task[Map[String, Meal]] = Task.effect {
+  val FAILURE = "Trello API request failed, or response was not deserializable."
+
+  def getMeals(config: TrelloConfig): Task[List[Meal]] = Task.effect {
     val url = s"https://api.trello.com/1/lists/${config.listId}/cards"
     basicRequest
       .get(uri"$url")
@@ -18,6 +20,5 @@ object Trello {
       .toOption // Ignore error message.
       .flatMap(_.decodeOption[List[Meal]])
       .getOrElse(Nil)
-      .foldLeft(Map.empty[String, Meal]) { case (map, m) => map + (m.id -> m) }
   }
 }

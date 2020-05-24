@@ -44,7 +44,15 @@ object Main extends App {
       }
 
       // 3) Get all meals from Trello.
-      mealsById <- Trello.getMealsById(config.trello)
+      meals <- Trello.getMeals(config.trello)
+      mealsById <- meals match {
+        case Nil => IO.fail(new Exception(Trello.FAILURE))
+        case _ => {
+          IO.succeed(meals.foldLeft(Map.empty[String, Meal]) {
+            case (map, meal) => map + (meal.id -> meal)
+          })
+        }
+      }
 
       // 4) Check that all meals are in the suggest counts
       // Add missing meals, remove meals no longer in Trello.
