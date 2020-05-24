@@ -9,16 +9,21 @@ object Trello {
 
   implicit private val backend = HttpURLConnectionBackend()
 
-  val FAILURE = "Trello API request failed, or response was not deserializable."
+  val API_ERROR = "Trello API request failed."
+  val DESERIALIZATION_ERROR = "Trello API response was not deserializable."
 
-  def getMeals(config: TrelloConfig): Task[List[Meal]] = Task.effect {
+  def getMeals(config: TrelloConfig): Task[List[Meal]] = {
     val url = s"https://api.trello.com/1/lists/${config.listId}/cards"
     basicRequest
       .get(uri"$url")
-      .send // send http request
-      .body // Either[String, String] (Left: error message, Right: response body)
-      .toOption // Ignore error message.
-      .flatMap(_.decodeOption[List[Meal]])
-      .getOrElse(Nil)
+      .send
+      .body
+      .fold(_ => IO.fail(new Exception(API_ERROR)), response => IO.succeed(response))
+      .flatMap { response =>
+        response.decodeOption[List[Meal]] match {
+          case Some(ms) => IO.succeed(ms)
+          case None     => IO.fail(new Exception(DESERIALIZATION_ERROR))
+        }
+      }
   }
 }

@@ -45,12 +45,9 @@ object Main extends App {
 
       // 3) Get all meals from Trello.
       meals <- Trello.getMeals(config.trello)
-      mealsById <- meals match {
-        case Nil => IO.fail(new Exception(Trello.FAILURE))
-        case _ => {
-          IO.succeed(meals.foldLeft(Map.empty[String, Meal]) {
-            case (map, meal) => map + (meal.id -> meal)
-          })
+      mealsById <- Task {
+        meals.foldLeft(Map.empty[String, Meal]) {
+          case (map, meal) => map + (meal.id -> meal)
         }
       }
 
