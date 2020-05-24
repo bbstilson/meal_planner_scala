@@ -7,9 +7,8 @@ import zio._
 class Trello(config: TrelloConfig) {
   import MealCodec._
 
-  val url = s"${config.urlBase}/lists/${config.listId}/cards"
-  val auth = Map("key" -> config.apiKey, "token" -> config.token)
-  implicit val backend = HttpURLConnectionBackend()
+  private val url = s"https://api.trello.com/1/lists/${config.listId}/cards"
+  implicit private val backend = HttpURLConnectionBackend()
 
   def getMealsById(): Task[Map[String, Meal]] = Task.effect {
     basicRequest
