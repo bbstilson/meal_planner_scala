@@ -3,7 +3,7 @@ import $ivy.`io.github.davidgregory084::mill-tpolecat:0.1.3`
 import mill._, scalalib._
 import io.github.davidgregory084.TpolecatModule
 
-object meal_planner_scala extends TpolecatModule {
+object meal_planner extends TpolecatModule {
   def scalaVersion = "2.13.2"
 
   def ivyDeps = Agg(
