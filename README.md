@@ -6,7 +6,7 @@ To solve the former problem, we've built up a few dozen recipes over the years t
 
 To solve the latter problem, I used ༼つ ◕_◕ ༽つ ***T E C H N O L O G Y***.
 
-The "algorithm" is laid out in [`Main.scala`](./meal_planner/src/org/bbstilson/Main.scala).
+The "algorithm" is laid out in [`Main.scala`](./meal_planner/src/org/bbstilson/Main.scala#L30).
 
 ## Technology
 
