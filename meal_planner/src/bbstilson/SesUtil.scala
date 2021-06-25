@@ -1,14 +1,14 @@
-package org.bbstilson
+package bbstilson
 
-import software.amazon.awssdk.services.ses.model._
+import software.amazon.awssdk.services.ses.model.*
 
-import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.*
 
-object SesUtil {
+object SesUtil:
   val SUBJECT = "Your weekly meal plan is here!"
   val CHARSET = "UTF-8"
 
-  def mkSendEmailRequest(config: SesConfig, meals: List[Meal]): SendEmailRequest = {
+  def mkSendEmailRequest(config: SesConfig, meals: List[Meal]): SendEmailRequest =
     val destination = Destination.builder.toAddresses(config.recipients.asJava).build
     val subjectContent = Content.builder.charset(CHARSET).data(SUBJECT).build
     val htmlContent = Content.builder.charset(CHARSET).data(mkBody(meals)).build
@@ -21,9 +21,8 @@ object SesUtil {
       .message(message)
       .replyToAddresses(config.recipients.head)
       .build
-  }
 
-  def mkBody(meals: List[Meal]): String = {
+  def mkBody(meals: List[Meal]): String =
     meals.flatMap { meal =>
       List(
         s"<h2>${meal.name}</h2>",
@@ -35,5 +34,3 @@ object SesUtil {
         "</p>"
       )
     }.mkString
-  }
-}
